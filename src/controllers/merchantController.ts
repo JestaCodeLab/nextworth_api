@@ -14,6 +14,7 @@ import { signToken, decodeTokenExpiry } from "../utils/jwt.js";
 import { cookieOptions } from "./authController.js";
 import { resend } from "../config/resend.js";
 import { env } from "../config/env.js";
+import { renderEmail } from "../utils/emailTemplate.js";
 import type { AuthedRequest } from "../middleware/auth.js";
 
 const locationInputSchema = z.object({
@@ -221,7 +222,12 @@ export async function updateMerchant(req: AuthedRequest, res: Response) {
         from: env.RESEND_FROM_EMAIL,
         to: merchant.contactEmail,
         subject: approvalTitle,
-        html: `<p>Hi ${merchant.name},</p><p>${approvalBody}</p>`,
+        html: renderEmail({
+          previewText: approvalBody,
+          heading: `Hi ${merchant.name}, you're approved`,
+          bodyHtml: `<p>${approvalBody}</p>`,
+          cta: { label: "Add a discount code", url: `${env.CLIENT_URL}/merchant/discounts` },
+        }),
       });
     }
   }

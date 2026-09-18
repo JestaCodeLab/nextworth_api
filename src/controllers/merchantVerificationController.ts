@@ -7,6 +7,7 @@ import { generateOtp, hashOtp } from "../utils/otp.js";
 import { sendSms } from "../utils/sms.js";
 import { resend } from "../config/resend.js";
 import { env } from "../config/env.js";
+import { renderEmail, emailCodeBlock } from "../utils/emailTemplate.js";
 import { zodErrorMessage } from "../utils/zodError.js";
 import type { AuthedRequest } from "../middleware/auth.js";
 
@@ -67,7 +68,11 @@ export async function sendVerificationCode(req: AuthedRequest, res: Response) {
       from: env.RESEND_FROM_EMAIL,
       to: destination,
       subject: "Your Nexworth verification code",
-      html: `<p>Hi ${merchant.name},</p><p>Your verification code is <strong>${code}</strong>. It expires in 10 minutes.</p>`,
+      html: renderEmail({
+        previewText: `Your verification code is ${code}.`,
+        heading: `Hi ${merchant.name}, here's your code`,
+        bodyHtml: `<p>Enter this code to verify your contact details. It expires in 10 minutes.</p>${emailCodeBlock(code)}`,
+      }),
     });
   }
 

@@ -7,6 +7,7 @@ import { SmsLog } from "../models/SmsLog.js";
 import { sendSms } from "../utils/sms.js";
 import { resend } from "../config/resend.js";
 import { env } from "../config/env.js";
+import { renderEmail } from "../utils/emailTemplate.js";
 
 const REMINDER_WINDOW_DAYS = 7;
 
@@ -64,7 +65,12 @@ export async function checkExpiringOffers() {
         from: env.RESEND_FROM_EMAIL,
         to: merchant.contactEmail,
         subject: title,
-        html: `<p>Hi ${merchant.name},</p><p>${body}</p>`,
+        html: renderEmail({
+          previewText: body,
+          heading: title,
+          bodyHtml: `<p>Hi ${merchant.name},</p><p>${body}</p>`,
+          cta: { label: "Update your discount codes", url: `${env.CLIENT_URL}/merchant/discounts` },
+        }),
       });
     }
 

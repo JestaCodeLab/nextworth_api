@@ -10,6 +10,7 @@ import { SmsLog } from "../models/SmsLog.js";
 import { generateCredentialId, generateCredentialCode } from "../utils/credential.js";
 import { generateResetToken } from "../utils/resetToken.js";
 import { sendSetPasswordEmail } from "../utils/email.js";
+import { renderEmail } from "../utils/emailTemplate.js";
 import { sendSms } from "../utils/sms.js";
 import { hashPassword } from "../utils/password.js";
 import { resend } from "../config/resend.js";
@@ -60,13 +61,18 @@ export async function approveUser(req: AuthedRequest, res: Response) {
   });
 
   const approvalTitle = "You're verified on Nexworth";
-  const approvalBody = `Hi ${user.name}, you're verified! Complete payment to activate your digital discount card.`;
+  const approvalBody = `You're verified! Complete payment to activate your digital discount card.`;
 
   await resend.emails.send({
     from: env.RESEND_FROM_EMAIL,
     to: user.email,
     subject: approvalTitle,
-    html: `<p>${approvalBody}</p>`,
+    html: renderEmail({
+      previewText: approvalBody,
+      heading: `Hi ${user.name}, you're verified`,
+      bodyHtml: `<p>${approvalBody}</p>`,
+      cta: { label: "Complete payment", url: `${env.CLIENT_URL}/credential` },
+    }),
   });
 
   // SMS is Ghana-only for now (see utils/sms.ts) — UK members just get the

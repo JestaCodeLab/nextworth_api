@@ -7,6 +7,7 @@ import { signToken, decodeTokenExpiry } from "../utils/jwt.js";
 import { getOnboardingStep } from "../utils/onboarding.js";
 import { zodErrorMessage } from "../utils/zodError.js";
 import { hashResetToken } from "../utils/resetToken.js";
+import { sendWelcomeEmail } from "../utils/email.js";
 import { env } from "../config/env.js";
 import type { AuthedRequest } from "../middleware/auth.js";
 
@@ -73,6 +74,9 @@ export async function register(req: Request, res: Response) {
 
   const token = signToken({ sub: user.id, role: "user" });
   res.cookie(env.COOKIE_NAME, token, cookieOptions);
+
+  // Best-effort — a delivery hiccup shouldn't fail a signup that already succeeded.
+  sendWelcomeEmail(user.email, user.name).catch((err) => console.error("sendWelcomeEmail failed", err));
 
   return res.status(201).json({ user: await serializeUser(user), expiresAt: decodeTokenExpiry(token) });
 }

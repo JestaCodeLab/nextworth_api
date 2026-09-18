@@ -6,6 +6,7 @@ import { AuditLog } from "../models/AuditLog.js";
 import { SmsLog } from "../models/SmsLog.js";
 import { resend } from "../config/resend.js";
 import { env } from "../config/env.js";
+import { renderEmail } from "../utils/emailTemplate.js";
 import { sendSms } from "../utils/sms.js";
 import { zodErrorMessage } from "../utils/zodError.js";
 import type { AuthedRequest } from "../middleware/auth.js";
@@ -64,7 +65,11 @@ export async function sendEmailAnnouncement(req: AuthedRequest, res: Response) {
         from: env.RESEND_FROM_EMAIL,
         to: recipient.email,
         subject,
-        html: `<p>Hi ${recipient.name},</p><p>${message}</p>`,
+        html: renderEmail({
+          previewText: message,
+          heading: subject,
+          bodyHtml: `<p>Hi ${recipient.name},</p><p>${message}</p>`,
+        }),
       });
       sent += 1;
     } catch {

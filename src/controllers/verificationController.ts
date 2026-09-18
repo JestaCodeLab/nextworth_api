@@ -3,9 +3,9 @@ import { Credential } from "../models/Credential.js";
 import { User } from "../models/User.js";
 import { VerificationEvent, type VerificationEventDoc } from "../models/VerificationEvent.js";
 
-type Result = VerificationEventDoc["result"];
+export type Result = VerificationEventDoc["result"];
 
-function computeResult(status: string, expiresAt?: Date | null): Result {
+export function computeResult(status: string, expiresAt?: Date | null): Result {
   if (status === "suspended") return "suspended";
   if (status === "expired" || (expiresAt && expiresAt.getTime() < Date.now())) return "expired";
   if (status === "active") return "valid";

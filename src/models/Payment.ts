@@ -1,7 +1,7 @@
 import { Schema, model, type InferSchemaType, type HydratedDocument } from "mongoose";
 
 export const PAYMENT_STATUSES = ["pending", "confirmed", "failed", "refund-flagged"] as const;
-export const CURRENCIES = ["GHS", "GBP"] as const;
+export const CURRENCIES = ["GHS", "USD"] as const;
 
 const paymentSchema = new Schema(
   {

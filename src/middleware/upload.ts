@@ -2,6 +2,18 @@ import multer, { type StorageEngine } from "multer";
 import type { Request } from "express";
 import { cloudinary } from "../config/cloudinary.js";
 
+declare global {
+  namespace Express {
+    namespace Multer {
+      interface File {
+        // Cloudinary's resolved resource type ("image" | "raw" | "video") —
+        // needed later to regenerate a signed URL for authenticated (KYC) assets.
+        resourceType?: string;
+      }
+    }
+  }
+}
+
 /**
  * Minimal multer storage engine that streams the file buffer straight to
  * Cloudinary (no local disk write). The ID document is KYC material and
@@ -26,7 +38,7 @@ class CloudinaryStorage implements StorageEngine {
         if (error || !result) {
           return callback(error ?? new Error("Cloudinary upload failed"));
         }
-        callback(null, { path: result.secure_url, filename: result.public_id });
+        callback(null, { path: result.secure_url, filename: result.public_id, resourceType: result.resource_type });
       },
     );
     file.stream.pipe(uploadStream);
@@ -44,3 +56,8 @@ export const uploadKycFiles = multer({
   { name: "photo", maxCount: 1 },
   { name: "document", maxCount: 1 },
 ]);
+
+export const uploadProfilePhoto = multer({
+  storage: new CloudinaryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 },
+}).single("photo");

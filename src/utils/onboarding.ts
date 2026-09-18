@@ -10,7 +10,7 @@ export type OnboardingStep = "verification" | "welcome" | "complete";
 export function getOnboardingStep(
   user: Pick<UserDoc, "role" | "dob" | "country" | "docUploadUrl" | "onboardingComplete">,
 ): OnboardingStep {
-  if (user.role === "admin") return "complete";
+  if (user.role === "admin" || user.role === "merchant") return "complete";
   if (!user.dob || !user.country || !user.docUploadUrl) return "verification";
   if (!user.onboardingComplete) return "welcome";
   return "complete";

@@ -15,7 +15,14 @@ const envSchema = z.object({
   CLOUDINARY_CLOUD_NAME: z.string().min(1, "CLOUDINARY_CLOUD_NAME is required"),
   CLOUDINARY_API_KEY: z.string().min(1, "CLOUDINARY_API_KEY is required"),
   CLOUDINARY_API_SECRET: z.string().min(1, "CLOUDINARY_API_SECRET is required"),
-  PAYSTACK_SECRET_KEY: z.string().optional(),
+  PAYSTACK_SECRET_KEY: z.string().min(1, "PAYSTACK_SECRET_KEY is required"),
+  PAYSTACK_PUBLIC_KEY: z.string().min(1, "PAYSTACK_PUBLIC_KEY is required"),
+  RESEND_API_KEY: z.string().min(1, "RESEND_API_KEY is required"),
+  RESEND_FROM_EMAIL: z.string().min(1, "RESEND_FROM_EMAIL is required"),
+  // Optional until the FlockText account/credentials exist — SMS sending
+  // degrades to a clear per-recipient failure until both are set.
+  FLOCKTEXT_API_KEY: z.string().optional(),
+  FLOCKTEXT_SENDER_ID: z.string().optional(),
   CLIENT_URL: z.string().default("http://localhost:3000"),
 });
 

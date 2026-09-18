@@ -12,11 +12,24 @@ const offerSchema = new Schema(
     terms: { type: String },
     isOnline: { type: Boolean, default: false },
     redemptionMethod: { type: String, enum: REDEMPTION_METHODS, default: "code" },
+    // The merchant's own private code for this offer — what they key into
+    // their own register/POS. Nexworth only ever displays it back to the
+    // merchant on the redemption screen; never exposed on the public offer
+    // summary below.
+    code: { type: String },
+    // Sale must be at least this much for the merchant to apply this offer —
+    // informational only, not enforced server-side (see Redemption.amountRedeemed).
+    minimumPurchaseAmount: { type: Number, min: 0 },
     validFrom: { type: Date },
     validTo: { type: Date },
+    // Tracks whether the expiry-reminder job has already warned the merchant
+    // for the current validTo — cleared whenever code/validTo changes so a
+    // renewed offer gets its own future reminder.
+    codeReminderSentAt: { type: Date },
     // V1 note: offers are not browsable individually yet — only the discount
     // summary (title/discountType/discountValue) is surfaced on the merchant
-    // map/list. Full offer detail pages are a Phase 2 feature.
+    // map/list. Full offer detail pages are a Phase 2 feature. `code` and
+    // `minimumPurchaseAmount` must never be included in that public summary.
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true },

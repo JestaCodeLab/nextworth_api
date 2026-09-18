@@ -7,7 +7,7 @@ import { Merchant } from "../models/Merchant.js";
 import { Payment } from "../models/Payment.js";
 import { AuditLog } from "../models/AuditLog.js";
 import { SmsLog } from "../models/SmsLog.js";
-import { generateCredentialId, generateCredentialCode } from "../utils/credential.js";
+import { generateCredentialId, generateCredentialCode, credentialQrPayload } from "../utils/credential.js";
 import { generateResetToken } from "../utils/resetToken.js";
 import { sendSetPasswordEmail } from "../utils/email.js";
 import { renderEmail } from "../utils/emailTemplate.js";
@@ -44,7 +44,7 @@ export async function approveUser(req: AuthedRequest, res: Response) {
     userId: user.id,
     credentialId,
     credentialCode: generateCredentialCode(),
-    qrPayload: `${env.CLIENT_URL}/verify/${credentialId}`,
+    qrPayload: credentialQrPayload(credentialId),
     status: "pending",
     market: user.country,
   });

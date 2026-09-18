@@ -24,6 +24,14 @@ const envSchema = z.object({
   FLOCKTEXT_API_KEY: z.string().optional(),
   FLOCKTEXT_SENDER_ID: z.string().optional(),
   CLIENT_URL: z.string().default("http://localhost:3000"),
+  // Comma-separated extra origins allowed to call the API (e.g. a Vercel
+  // preview/production URL) beyond CLIENT_URL, which stays the one used for
+  // building links in emails.
+  CORS_ORIGINS: z.string().optional(),
 });
 
 export const env = envSchema.parse(process.env);
+
+export const corsOrigins = [env.CLIENT_URL, ...(env.CORS_ORIGINS?.split(",") ?? [])].map((origin) =>
+  origin.trim().replace(/\/+$/, ""),
+);

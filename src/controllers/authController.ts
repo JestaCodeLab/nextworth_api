@@ -11,10 +11,18 @@ import { sendWelcomeEmail } from "../utils/email.js";
 import { env } from "../config/env.js";
 import type { AuthedRequest } from "../middleware/auth.js";
 
+// The client (Vercel) and API live on different domains, which browsers
+// treat as cross-site — SameSite=Lax cookies are never attached to
+// cross-site fetch/XHR requests (only to top-level navigations), so the
+// session cookie from login would silently never reach the API on the very
+// next request. SameSite=None is required for that, which in turn requires
+// Secure (browsers reject None without it) — Chromium-family browsers treat
+// http://localhost as a trustworthy origin, so this still works for local
+// dev against http://localhost.
 export const cookieOptions = {
   httpOnly: true,
-  secure: env.NODE_ENV === "production",
-  sameSite: "lax" as const,
+  secure: true,
+  sameSite: "none" as const,
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 

@@ -3,7 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
-import { env } from "./config/env.js";
+import { env, corsOrigins } from "./config/env.js";
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import adminActionRoutes from "./routes/admin.routes.js";
@@ -18,7 +18,7 @@ const app = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: env.CLIENT_URL,
+    origin: corsOrigins,
     credentials: true,
   }),
 );
